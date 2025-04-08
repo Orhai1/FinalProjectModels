@@ -8,7 +8,7 @@ import pandas as pd
 model_path = "symbols_recogniton_models/symbols_tm1/keras_model.h5"
 labels_path = "symbols_recogniton_models/symbols_tm1/labels.txt"
 input_base_dir = "test_set"  # directory containing folders for each test class
-csv_path = "symbol_model_tm1_results.csv"  # path to save results
+csv_path = "symbol_model_tm1_results"  # path to save results
 image_size = (224, 224)
 
 # load model
@@ -64,9 +64,25 @@ for folder in os.listdir(input_base_dir):
         except Exception as e:
             print(f"Failed to process {image_path}: {e}")
 
-# print results
-df = pd.DataFrame(results)
-print(df)
 
 # Save to CSV
-df.to_csv(csv_path, index=False)
+df = pd.DataFrame(results)
+df.to_csv(f"{csv_path}.csv", index=False)
+
+# Group by Folder (true label)
+summary = df.groupby("Folder").agg(
+    total_images=pd.NamedAgg(column="Match", aggfunc="count"),
+    correct_predictions=pd.NamedAgg(column="Match", aggfunc="sum"),
+    average_confidence=pd.NamedAgg(column="Confidence", aggfunc="mean")
+)
+
+# Calculate accuracy
+summary["Accuracy (%)"] = (summary["correct_predictions"] / summary["total_images"]) * 100
+summary["Correct / Total"] = summary["correct_predictions"].astype(str) + " / " + summary["total_images"].astype(str)
+
+# Reorder and format
+summary = summary.reset_index()[["Folder", "Correct / Total", "Accuracy (%)", "average_confidence"]]
+summary.rename(columns={"average_confidence": "Avg Confidence"}, inplace=True)
+
+# Save to file
+summary.to_csv(f"{csv_path}_summary.csv", index=False)
