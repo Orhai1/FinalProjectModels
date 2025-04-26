@@ -1,0 +1,3 @@
+This model was trained in teachable machine on the original photos of the symbols,
+and with "other" folder containing 50 frames from tiktok videos that are not related to the symbols.
+Trained on default settings.
