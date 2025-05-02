@@ -1,0 +1,5 @@
+Fatah_symbol_gun
+Fatah_symbol_mount
+Hamas_symbol
+Hamas_ribbon
+Other

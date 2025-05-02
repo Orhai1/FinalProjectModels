@@ -1,85 +1,70 @@
 import os
-import random
 import shutil
 from collections import defaultdict
+from sklearn.model_selection import train_test_split
 
-# Paths to the labeled dataset
-images_dir = 'augmented/images'
-labels_dir = 'augmented/labels'
+# Input paths
+base_dir = "labeled_data/v3"
+images_dir = os.path.join(base_dir, "images")
+labels_dir = os.path.join(base_dir, "labels")
+classes_path = os.path.join(base_dir, "classes.txt")
 
-# Output paths
-train_img_dir = 'labeled_dataset_v2/images/train'
-train_lbl_dir = 'labeled_dataset_v2/labels/train'
-val_img_dir = 'labeled_dataset_v2/images/val'
-val_lbl_dir = 'labeled_dataset_v2/labels/val'
-test_img_dir = 'labeled_dataset_v2/images/test'
-test_lbl_dir = 'labeled_dataset_v2/labels/test'
+# Output structure
+split_base = "labeled_dataset_v3"
+train_img_dir = os.path.join(split_base, "images/train")
+val_img_dir = os.path.join(split_base, "images/val")
+test_img_dir = os.path.join(split_base, "images/test")
+train_lbl_dir = os.path.join(split_base, "labels/train")
+val_lbl_dir = os.path.join(split_base, "labels/val")
+test_lbl_dir = os.path.join(split_base, "labels/test")
 
-# Create output folders
-for d in [train_img_dir, train_lbl_dir, val_img_dir, val_lbl_dir, test_img_dir, test_lbl_dir]:
+for d in [train_img_dir, val_img_dir, test_img_dir, train_lbl_dir, val_lbl_dir, test_lbl_dir]:
     os.makedirs(d, exist_ok=True)
 
-# Organize images by class
-class_to_files = defaultdict(list)
-for label_file in os.listdir(labels_dir):
-    if label_file.endswith('.txt'):
-        label_path = os.path.join(labels_dir, label_file)
-        with open(label_path, 'r') as f:
-            lines = f.readlines()
-        if not lines:
-            continue
-        first_class = int(float(lines[0].split()[0]))
-        image_file = os.path.splitext(label_file)[0] + '.jpg'
-        if os.path.exists(os.path.join(images_dir, image_file)):
-            class_to_files[first_class].append((image_file, label_file))
+# Match images with labels
+image_files = [f for f in os.listdir(images_dir) if f.endswith(('.jpg', '.jpeg', '.png'))]
+paired_images = []
 
-# Stratified split per class: 70% train, 20% val, 10% test
-train_files = []
-val_files = []
-test_files = []
+for img_file in image_files:
+    base = os.path.splitext(img_file)[0]
+    label_file = base + ".txt"
+    if os.path.exists(os.path.join(labels_dir, label_file)):
+        paired_images.append((img_file, label_file))
 
-for cls, files in class_to_files.items():
-    random.shuffle(files)
-    n = len(files)
-    n_train = int(0.7 * n)
-    n_val = int(0.2 * n)
-    train_files.extend(files[:n_train])
-    val_files.extend(files[n_train:n_train + n_val])
-    test_files.extend(files[n_train + n_val:])
+# Optional: load dominant class per image for stratify (best-effort)
+dominant_classes = []
+for img, lbl in paired_images:
+    with open(os.path.join(labels_dir, lbl)) as f:
+        lines = f.readlines()
+    classes = [int(float(l.split()[0])) for l in lines if l.strip()]
+    dominant_classes.append(min(classes) if classes else -1)
 
-def copy_pairs(file_list, target_img_dir, target_lbl_dir):
-    for img_file, lbl_file in file_list:
-        src_img_path = str(os.path.join(images_dir, img_file))
-        dst_img_path = str(os.path.join(target_img_dir, img_file))
-        src_lbl_path = str(os.path.join(labels_dir, lbl_file))
-        dst_lbl_path = str(os.path.join(target_lbl_dir, lbl_file))
+# Split train/val/test: 70/20/10
+train_val, test = train_test_split(paired_images, test_size=0.1, stratify=dominant_classes, random_state=42)
+train_val_classes = [dominant_classes[paired_images.index(i)] for i in train_val]
+train, val = train_test_split(train_val, test_size=0.2222, stratify=train_val_classes, random_state=42)  # 0.2222 * 0.9 ≈ 0.2
 
-        shutil.copy(src_img_path, dst_img_path)
-        shutil.copy(src_lbl_path, dst_lbl_path)
+# Copy files
+def copy_split(data, img_out, lbl_out):
+    for img, lbl in data:
+        shutil.copy(os.path.join(images_dir, img), os.path.join(img_out, img))
+        shutil.copy(os.path.join(labels_dir, lbl), os.path.join(lbl_out, lbl))
 
-copy_pairs(train_files, train_img_dir, train_lbl_dir)
-copy_pairs(val_files, val_img_dir, val_lbl_dir)
-copy_pairs(test_files, test_img_dir, test_lbl_dir)
+copy_split(train, train_img_dir, train_lbl_dir)
+copy_split(val, val_img_dir, val_lbl_dir)
+copy_split(test, test_img_dir, test_lbl_dir)
 
-print(f"Stratified split complete. {len(train_files)} train, {len(val_files)} val, {len(test_files)} test images.")
+# Load class names
+with open(classes_path) as f:
+    class_names = [line.strip() for line in f if line.strip()]
 
-# Create detect.yaml for YOLO training
-yaml_path = 'labeled_dataset_v2/detect.yaml'
-class_names = ["fatah_101",
-                "fatah_gun",
-                "fatah_intelligence",
-                "fatah_mount",
-                "fatah_police",
-                "fatah_presidential",
-                "fatah_youth",
-                "hamas_ribbon",
-                "hamas_symbol"]
-
+# Generate YAML
+yaml_path = os.path.join(split_base, "data.yaml")
 with open(yaml_path, 'w') as f:
-    f.write(f"train: {train_img_dir}\n")
-    f.write(f"val: {val_img_dir}\n")
-    f.write(f"test: {test_img_dir}\n")
+    f.write(f"train: images/train\n")
+    f.write(f"val: images/val\n")
+    f.write(f"test: images/test\n")
     f.write(f"nc: {len(class_names)}\n")
     f.write(f"names: {class_names}\n")
 
-print(f"detect.yaml generated at {yaml_path}")
+print("Dataset split complete with train/val/test and data.yaml generated at:", yaml_path)
