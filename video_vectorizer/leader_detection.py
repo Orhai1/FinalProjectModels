@@ -1,23 +1,48 @@
 import os
-import joblib
-from PIL import Image
+from deepface import DeepFace
+from joblib import load
 
-leader_model = joblib.load("leader_model.pkl")
-leader_classes = ['arafat', 'haniyeh']  # Adjust if dynamic
+# Adjust path to model files relative to this script location
+base_path = "../LeadersRecognition/DeepFaceRandomForestModel"
+model = load(os.path.join(base_path, "model_randomforest.pkl"))
+scaler = load(os.path.join(base_path, "scaler.pkl"))
+le = load(os.path.join(base_path, "label_encoder.pkl"))
 
-def extract_features_for_leader_model(image):
-    # Define your own image-to-feature logic
-    return [...]
+# Classes you want to detect
+leader_classes = ['Arafat', 'AbuGihad', 'AbuMazen', 'Aruri', 'Hania', 'HosainHasheh', 'Sinwar', 'Yassin']
+leader_classes_lower = [name.lower() for name in leader_classes]
+
+def extract_faces_from_frame(image_path):
+    try:
+        faces = DeepFace.represent(
+            img_path=image_path,
+            model_name="ArcFace",
+            detector_backend="retinaface",
+            enforce_detection=False,
+            align=True
+        )
+        return [face["embedding"] for face in faces]
+    except Exception as e:
+        print(f"Failed to process {image_path}: {e}")
+        return []
 
 def detect_leaders_in_frames(frames_dir):
     detected = {f'leader_{name}': 0 for name in leader_classes}
 
     for filename in os.listdir(frames_dir):
-        image = Image.open(os.path.join(frames_dir, filename)).convert("RGB")
-        features = extract_features_for_leader_model(image)
-        probs = leader_model.predict_proba([features])[0]
-        for i, leader in enumerate(leader_classes):
-            if probs[i] > 0.5:
-                detected[f'leader_{leader}'] = 1
+        image_path = os.path.join(frames_dir, filename)
+        if not os.path.isfile(image_path): continue
+        embeddings = extract_faces_from_frame(image_path)
+
+        for embedding in embeddings:
+            try:
+                scaled = scaler.transform([embedding])
+                pred_id = model.predict(scaled)[0]
+                label = le.inverse_transform([pred_id])[0].lower()
+                if (label in leader_classes) or (label in leader_classes_lower):
+                    original_name = leader_classes[leader_classes_lower.index(label)]
+                    detected[f'leader_{original_name}'] = 1
+            except Exception as e:
+                print(f"Classification failed on {filename}: {e}")
 
     return detected
