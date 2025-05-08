@@ -85,7 +85,17 @@ def remove_identical_frames(folder_path, mse_threshold=1.0):
 
     # print(f"Done. Removed {deleted} identical frames. Kept {len(kept)}.")
 
+def extract_and_filter(video_path, base_interval=2, mse_threshold=5):
+    """
+    Extract frames from a video and remove identical frames.
+    :param video_path: Path to the input video
+    :param base_interval: Base interval in seconds for frame extraction
+    :param mse_threshold: MSE threshold for identifying identical frames
+    """
+    # Extract frames every n seconds
+    output_path = extract_every_n_seconds(video_path, base_interval)
 
-video_path = "/Users/noga/Documents/BarIlan/Year3/Project/LabelingApp/ServerSide/db/downloads/7287950743196257544.mp4"
-output_path = extract_every_n_seconds(video_path, 2)
-remove_identical_frames(output_path,5)
+    # Remove identical frames
+    remove_identical_frames(output_path, mse_threshold)
+
+    print(f"Frames extracted and filtered in {output_path}")

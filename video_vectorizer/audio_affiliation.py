@@ -1,3 +1,12 @@
-def check_audio_tags(audio_tags):
-    affiliated_song_tags = {"hamas nasheed", "fatah anthem"}
-    return {"uses_affiliated_song": int(any(tag.lower() in affiliated_song_tags for tag in audio_tags))}
+import pandas as pd
+
+def load_audio_id_set(csv_path = '../Audio/audio_ids.csv'):
+    df = pd.read_csv(csv_path)
+    return set(df['audio_id'].astype(str))
+
+def check_audio_tags(audio_id):
+    affiliated_song_tags = load_audio_id_set()
+    if audio_id in affiliated_song_tags:
+        return {"uses_affiliated_song": 1}
+    else:
+        return {"uses_affiliated_song": 0}

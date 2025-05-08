@@ -1,8 +1,10 @@
 from ultralytics import YOLO
 import os
 
-model = YOLO("symbol_model.pt")  # Load once
+# Load the YOLO model and class names
+model = YOLO("../Symbols/symbols_detection_models/yolo11s_v3_updated1/model.pt")
 symbol_classes = [model.names[i] for i in range(len(model.names))]
+
 
 def detect_symbols_in_frames(frames_dir, confidence_threshold=0.5):
     detected = {f'symbol_{cls}': 0 for cls in symbol_classes}
