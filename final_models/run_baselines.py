@@ -11,6 +11,7 @@ from baseline_models import (
 )
 
 def run_all_baselines(npz_path,
+                      scale=False,
                       sample_size=None,
                       test_size=0.20,
                       kfold=5,
@@ -37,9 +38,9 @@ def run_all_baselines(npz_path,
 
     # Define baselines to compare
     models = {
-        "LogisticReg": make_logreg_pipeline(), # linear + class_weight
-        "BalancedRF":  make_balanced_rf(seed), # non-linear, imbalance-aware
-        "LogReg+SMOTE": make_logreg_with_smote(seed), # linear + SMOTE
+        "LogisticReg": make_logreg_pipeline(scale), # linear + class_weight
+        "BalancedRF":  make_balanced_rf(seed, scale), # non-linear, imbalance-aware
+        "LogReg+SMOTE": make_logreg_with_smote(seed, scale), # linear + SMOTE
         "RF+SMOTE":  make_rf_with_smote(seed), # non-linear + SMOTE
         "XGBoost":  make_xgb(seed), # non-linear + class_weight,
         "XGBoost+SMOTE": make_xgb(seed, use_smote=True), # non-linear + SMOTE
@@ -83,8 +84,8 @@ def run_all_baselines(npz_path,
 
 
 if __name__ == "__main__":
-    # quick example run – change the sample_size or npz_path as you like
-    run_all_baselines(npz_path="data/aux_features_clean.npz",
+    run_all_baselines(npz_path="data/bigru_early_fusion.npz",
+                      scale=True,
                       sample_size=None,
                       test_size=0.2,
                       kfold=5,

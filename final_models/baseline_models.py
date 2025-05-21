@@ -43,37 +43,36 @@ def load_features(npz_path,
     return X, y, ids
 
 
-def make_logreg_pipeline():
+def make_logreg_pipeline(split_blocks=False):
     """Create a pipeline with StandardScaler and LogisticRegression."""
+    scaler = make_scaler(split_blocks)
     return make_pipeline(
-        StandardScaler(),
+        scaler,
         LogisticRegression(solver='lbfgs',
                            max_iter=10_000,
                            class_weight="balanced")
     )
 
 
-def make_balanced_rf(random_seed=42):
+def make_balanced_rf(random_seed=42, split_blocks=False):
     """Create a BalancedRandomForestClassifier."""
-    return BalancedRandomForestClassifier(
-        n_estimators=400,
-        sampling_strategy="auto",
-        n_jobs=1,
-        random_state=random_seed
-    )
+    scaler = make_scaler(split_blocks)
+    rf = BalancedRandomForestClassifier(
+                 sampling_strategy="auto", n_estimators=400, random_state=random_seed)
+    return make_pipeline(scaler, rf)
 
 
-def make_logreg_with_smote(random_seed=42):
+def make_logreg_with_smote(random_seed=42, split_blocks=False):
     """
     Pipeline: [SMOTE] ➜ [StandardScaler] ➜ [LogisticRegression]
     SMOTE is applied *only* on the training folds inside CV.
     """
     smote = SMOTE(random_state=random_seed, k_neighbors=5)
-    scaler = StandardScaler()
+    scaler = make_scaler(split_blocks)
     clf = LogisticRegression(max_iter=10_000, class_weight=None)
     return Pipeline(steps=[
-        ("smote", smote),
         ("scale", scaler),
+        ("smote", smote),
         ("clf"  , clf)
     ])
 
@@ -148,3 +147,21 @@ def cv_score(X, y, model, k=5, seed=42):
                              cv=skf,
                              n_jobs=1)
     return scores.mean(), scores.std()
+
+
+def make_scaler(split_blocks=False, n_video=768):
+    """
+    Returns a scikit-learn transformer that
+      • if split_blocks=False  → StandardScaler() on the whole matrix
+      • if split_blocks=True   → ColumnTransformer that
+          – scales [0:n_video]  with its own StandardScaler
+          – scales [n_video:]   with another StandardScaler
+    """
+    if not split_blocks:
+        return StandardScaler()
+
+    from sklearn.compose import ColumnTransformer
+    return ColumnTransformer([
+        ("video", StandardScaler(), slice(0, n_video)),
+        ("aux",   StandardScaler(), slice(n_video, None))
+    ])
