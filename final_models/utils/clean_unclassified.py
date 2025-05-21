@@ -19,8 +19,8 @@ X, y, ids = X[mask_good], y[mask_good], ids[mask_good]
 counts = Counter(y)
 valid_classes = {cls for cls, cnt in counts.items()}
 
-print("✅ kept", len(y), "samples across", len(valid_classes), "classes")
-print("   class counts:", Counter(y))
+print("kept", len(y), "samples across", len(valid_classes), "classes")
+print("class counts:", Counter(y))
 
 # 4. Save the cleaned feature file
 np.savez(OUT_NPZ, X=X, y=y, video_id=ids)
