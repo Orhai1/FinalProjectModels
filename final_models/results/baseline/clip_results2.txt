@@ -1,0 +1,95 @@
+Baseline Results for aux features early fusioned with Clip features without helper models:
+(with clip_early_fusion2.npz)
+
+――――  LogisticReg  ――――
+Hold-out balanced-accuracy: 0.6246902315941245
+              precision    recall  f1-score   support
+
+       Fatah      0.686     0.729     0.707        48
+       Hamas      0.171     0.259     0.206        27
+Unaffiliated      0.924     0.886     0.904       411
+
+    accuracy                          0.835       486
+   macro avg      0.594     0.625     0.606       486
+weighted avg      0.859     0.835     0.846       486
+
+5-fold CV balanced-acc : 0.651 ± 0.013
+
+――――  BalancedRF  ――――
+Hold-out balanced-accuracy: 0.714444219158331
+              precision    recall  f1-score   support
+
+       Fatah      0.515     0.729     0.603        48
+       Hamas      0.171     0.704     0.275        27
+Unaffiliated      0.951     0.710     0.813       411
+
+    accuracy                          0.712       486
+   macro avg      0.546     0.714     0.564       486
+weighted avg      0.865     0.712     0.763       486
+
+5-fold CV balanced-acc : 0.690 ± 0.046
+
+――――  LogReg+SMOTE  ――――
+Hold-out balanced-accuracy: 0.6493815896188159
+              precision    recall  f1-score   support
+
+       Fatah      0.700     0.729     0.714        48
+       Hamas      0.205     0.333     0.254        27
+Unaffiliated      0.929     0.886     0.907       411
+
+    accuracy                          0.840       486
+   macro avg      0.611     0.649     0.625       486
+weighted avg      0.866     0.840     0.851       486
+
+5-fold CV balanced-acc : 0.641 ± 0.019
+
+――――  RF+SMOTE  ――――
+Hold-out balanced-accuracy: 0.5307459223213481
+              precision    recall  f1-score   support
+
+       Fatah      0.964     0.562     0.711        48
+       Hamas      0.333     0.037     0.067        27
+Unaffiliated      0.897     0.993     0.942       411
+
+    accuracy                          0.897       486
+   macro avg      0.731     0.531     0.573       486
+weighted avg      0.872     0.897     0.871       486
+
+5-fold CV balanced-acc : 0.526 ± 0.025
+
+――――  XGBoost  ――――
+Hold-out balanced-accuracy: 0.5307459223213481
+              precision    recall  f1-score   support
+
+       Fatah      0.871     0.562     0.684        48
+       Hamas      1.000     0.037     0.071        27
+Unaffiliated      0.899     0.993     0.943       411
+
+    accuracy                          0.897       486
+   macro avg      0.923     0.531     0.566       486
+weighted avg      0.902     0.897     0.869       486
+
+5-fold CV balanced-acc : 0.527 ± 0.022
+
+――――  XGBoost+SMOTE  ――――
+Hold-out balanced-accuracy: 0.5406585113093629
+              precision    recall  f1-score   support
+
+       Fatah      0.844     0.562     0.675        48
+       Hamas      0.500     0.074     0.129        27
+Unaffiliated      0.900     0.985     0.941       411
+
+    accuracy                          0.893       486
+   macro avg      0.748     0.541     0.582       486
+weighted avg      0.872     0.893     0.869       486
+
+5-fold CV balanced-acc : 0.593 ± 0.018
+
+=====  Summary (sorted by CV mean)  =====
+        model  split_bal_acc  cv_bal_acc_mean  cv_bal_acc_std
+   BalancedRF          0.714            0.690           0.046
+  LogisticReg          0.625            0.651           0.013
+ LogReg+SMOTE          0.649            0.641           0.019
+XGBoost+SMOTE          0.541            0.593           0.018
+      XGBoost          0.531            0.527           0.022
+     RF+SMOTE          0.531            0.526           0.025

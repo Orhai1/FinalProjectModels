@@ -46,12 +46,13 @@ def load_features(npz_path,
 def make_logreg_pipeline(split_blocks=False):
     """Create a pipeline with StandardScaler and LogisticRegression."""
     scaler = make_scaler(split_blocks)
-    return make_pipeline(
-        scaler,
-        LogisticRegression(solver='lbfgs',
+    return Pipeline([
+        ("scale", scaler),
+        ("clf", LogisticRegression(solver='lbfgs',
                            max_iter=10_000,
-                           class_weight="balanced")
-    )
+                           class_weight="balanced",
+                            tol=1e-3 ))]
+         )
 
 
 def make_balanced_rf(random_seed=42, split_blocks=False):
@@ -59,7 +60,9 @@ def make_balanced_rf(random_seed=42, split_blocks=False):
     scaler = make_scaler(split_blocks)
     rf = BalancedRandomForestClassifier(
                  sampling_strategy="auto", n_estimators=400, random_state=random_seed)
-    return make_pipeline(scaler, rf)
+    return Pipeline([
+        ("scale", scaler),
+        ("clf", rf)])
 
 
 def make_logreg_with_smote(random_seed=42, split_blocks=False):
@@ -109,16 +112,19 @@ def make_xgb(random_seed=42, use_smote=False):
         n_jobs         = -1,
         random_state   = random_seed
     )
-
     wrapped = LabelEncoderWrapper(xgb_core)
 
+    steps = []
+
+    # optional SMOTE
     if use_smote:
-        return Pipeline([
-            ("smote", SMOTE(random_state=random_seed)),
-            ("xgb"  , wrapped)
-        ])
-    else:
-        return wrapped
+        steps.append(("smote", SMOTE(random_state=random_seed)))
+
+    # add classifier
+    steps.append(("clf", wrapped))
+
+    return Pipeline(steps)
+
 
 def train_test_once(X, y, model, test_size=0.2, seed=42):
     """Train-test split and evaluate the model."""
