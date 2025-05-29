@@ -1,2 +1,0 @@
-Baseline Results for aux features early fusioned with videoMAE features:
-
