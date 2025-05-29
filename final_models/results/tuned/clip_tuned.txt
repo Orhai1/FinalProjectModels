@@ -1,0 +1,50 @@
+――――  LogisticReg  ――――
+Fitting 5 folds for each of 25 candidates, totalling 125 fits
+Hold-out balanced-accuracy: 0.871203928989817
+              precision    recall  f1-score   support
+
+       Fatah      0.846     0.917     0.880        48
+       Hamas      0.645     0.741     0.690        27
+Unaffiliated      0.975     0.956     0.966       411
+
+    accuracy                          0.940       486
+   macro avg      0.822     0.871     0.845       486
+weighted avg      0.944     0.940     0.942       486
+
+5-fold CV balanced-acc : 0.835 ± 0.043
+
+――――  BalancedRF  ――――
+Fitting 5 folds for each of 25 candidates, totalling 125 fits
+Hold-out balanced-accuracy: 0.9047997206452193
+              precision    recall  f1-score   support
+
+       Fatah      0.891     0.854     0.872        48
+       Hamas      0.472     0.926     0.625        27
+Unaffiliated      0.992     0.934     0.962       411
+
+    accuracy                          0.926       486
+   macro avg      0.785     0.905     0.820       486
+weighted avg      0.953     0.926     0.935       486
+
+5-fold CV balanced-acc : 0.836 ± 0.031
+
+――――  XGBoost  ――――
+Fitting 5 folds for each of 50 candidates, totalling 250 fits
+Hold-out balanced-accuracy: 0.7266941515724971
+              precision    recall  f1-score   support
+
+       Fatah      0.895     0.708     0.791        48
+       Hamas      0.867     0.481     0.619        27
+Unaffiliated      0.940     0.990     0.964       411
+
+    accuracy                          0.934       486
+   macro avg      0.900     0.727     0.791       486
+weighted avg      0.931     0.934     0.928       486
+
+5-fold CV balanced-acc : 0.709 ± 0.021
+
+=====  Summary (sorted by CV mean)  =====
+      model  split_bal_acc  cv_bal_acc_mean  cv_bal_acc_std
+ BalancedRF          0.905            0.836           0.031
+LogisticReg          0.871            0.835           0.043
+    XGBoost          0.727            0.709           0.021

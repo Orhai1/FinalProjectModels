@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import os
 
 # Load the YOLO model and class names
-model = YOLO("../Symbols/symbols_detection_models/yolo11s_v3_updated1/model.pt")
+model = YOLO("../symbols_detection/symbols_detection_models/yolo11s_v3_updated1/model.pt")
 symbol_classes = [model.names[i] for i in range(len(model.names))]
 
 
