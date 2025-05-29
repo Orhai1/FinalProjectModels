@@ -42,6 +42,6 @@ def detect_text(image_path, min_confidence=0.2):
 
 
 # Example usage
-image_path = '../Symbols/video_frames/7314560502917516562_frames/7314560502917516562_frame_0002.jpg'
+image_path = '../symbols_detection/video_frames/7314560502917516562_frames/7314560502917516562_frame_0002.jpg'
 detect_text(image_path)
 

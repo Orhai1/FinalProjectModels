@@ -6,8 +6,8 @@ def load_keywords_from_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         return set(line.strip() for line in f if line.strip())
 
-hamas_keywords = load_keywords_from_file('../Text/hamas_keywords.txt')
-fatah_keywords = load_keywords_from_file('../Text/fatah_keywords.txt')
+hamas_keywords = load_keywords_from_file('../text_detection/hamas_keywords.txt')
+fatah_keywords = load_keywords_from_file('../text_detection/fatah_keywords.txt')
 
 # Initialize EasyOCR
 reader = easyocr.Reader(['ar', 'en'], gpu=False)

@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 
 # CONFIG
-model_path = "symbols_recogniton_models/symbols_tm6/keras_model.h5"
-labels_path = "symbols_recogniton_models/symbols_tm6/labels.txt"
+model_path = "symbols_detection_models/symbols_tm6/keras_model.h5"
+labels_path = "symbols_detection_models/symbols_tm6/labels.txt"
 input_base_dir = "dataset_v1/test_set"  # directory containing folders for each test class
 csv_path = "symbol_model_tm6_results"  # path to save results
 image_size = (224, 224)

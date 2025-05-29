@@ -49,7 +49,7 @@ def generate_word_bank_from_images(folder_path):
 
 # Example usage:
 if __name__ == "__main__":
-    image_folder = '../Symbols/video_frames/7314560502917516562_frames'  # replace with your folder path
+    image_folder = '../symbols_detection/video_frames/7314560502917516562_frames'  # replace with your folder path
     word_bank = generate_word_bank_from_images(image_folder)
 
     print("\n All words in frames:")
