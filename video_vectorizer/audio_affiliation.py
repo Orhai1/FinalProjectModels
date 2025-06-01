@@ -1,6 +1,6 @@
 import pandas as pd
 
-def load_audio_id_set(csv_path = '../audio_utils/audio_ids.csv'):
+def load_audio_id_set(csv_path = 'audio_ids.csv'):
     df = pd.read_csv(csv_path)
     return set(df['audio_id'].astype(str))
 

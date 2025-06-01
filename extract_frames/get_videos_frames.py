@@ -24,8 +24,8 @@ s3 = boto3.client(
 # Constants
 BUCKET_NAME = "tiktok-project-storage"
 S3_FOLDER = "videos/downloads/"
-OUTPUT_DIR = "model_videos_frames/"
-CSV_PATH = "model_videos_list.csv"
+OUTPUT_DIR = "../model_videos_frames/"
+CSV_PATH = "../model_videos_list.csv"
 
 # Read video IDs
 df = pd.read_csv(CSV_PATH, header=None)
