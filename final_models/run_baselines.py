@@ -1,20 +1,11 @@
 import os
 import warnings
 
-from xgboost import XGBClassifier
-
 warnings.simplefilter("ignore", FutureWarning)
 os.environ["PYTHONWARNINGS"] = "ignore::FutureWarning"
 
 import json
 import joblib
-
-# warnings.filterwarnings("ignore")
-# warnings.filterwarnings(
-#     "ignore",
-#     category=FutureWarning,
-#     module=r"^sklearn\."
-# )
 
 import pandas as pd
 from baseline_models import (

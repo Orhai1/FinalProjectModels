@@ -1,0 +1,17 @@
+Classification Report:
+              precision    recall  f1-score   support
+
+       Fatah       0.94      0.87      0.90        38
+       Hamas       1.00      0.68      0.81        34
+Unaffiliated       0.00      0.00      0.00         0
+
+    accuracy                           0.78        72
+   macro avg       0.65      0.51      0.57        72
+weighted avg       0.97      0.78      0.86        72
+
+
+Confusion Matrix:
+                   pred_Fatah  pred_Hamas  pred_Unaffiliated
+true_Fatah                 33           0                  5
+true_Hamas                  2          23                  9
+true_Unaffiliated           0           0                  0

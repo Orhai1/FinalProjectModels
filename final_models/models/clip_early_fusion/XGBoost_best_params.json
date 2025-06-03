@@ -1,0 +1,7 @@
+{
+  "clf__model__colsample_bytree": 0.8560204063533432,
+  "clf__model__learning_rate": 0.12294074748835755,
+  "clf__model__max_depth": 8,
+  "clf__model__n_estimators": 701,
+  "clf__model__subsample": 0.9325398470083344
+}
